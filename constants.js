@@ -15,8 +15,8 @@ const Type = {
 };
 
 const Hotkey = {
-  JIRA: "story",
-  FILE: "txt",
+  JIRA: "git",
+  FILE: "file",
 };
 
 const AHK_HEADER = `#SingleInstance Force\n\n`;
@@ -50,5 +50,5 @@ module.exports = {
   PREFIX,
   Labels,
   PROJECT_RESOURCES_FOLDER,
-  BUILD_FOLDER
+  BUILD_FOLDER,
 };
