@@ -23,10 +23,9 @@ async function buildSprint() {
 
   console.log(sprintData);
 
-  // writeSprintAHK(sprintData);
-  // makeSnapshotFolders(sprintData);
-  sendSprintCards
-  ToBoard(sprintData);
+  writeSprintAHK(sprintData);
+  makeSnapshotFolders(sprintData);
+  sendSprintCardsToBoard(sprintData);
 }
 
 buildSprint();
