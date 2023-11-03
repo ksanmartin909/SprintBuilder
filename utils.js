@@ -121,6 +121,9 @@ const makeSnapshotFolders = async (projectData) => {
   sprint = sprint ?? "sprint";
   let folders = [];
   for (let [key, value] of Object.entries(tickets)) {
+    if(value.includes("/")) {
+      value = value.split("/")[1];
+    }
     let text = value.split("-").join(" ");
     folders.push(
       `"${PROJECT_RESOURCES_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}"`
