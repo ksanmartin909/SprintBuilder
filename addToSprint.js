@@ -2,17 +2,18 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const BASE_RESOURCES_FOLDER = `D:\\Users\\Filament_Games\\Documents\\ProjectResources`;
 
-const PROJECT_FOLDER = `${BASE_RESOURCES_FOLDER}\\CSAR\\v1.40\\Tickets\\sprint-5`;
-// const PROJCET_FOLDER: `${BASE_RESOURCES_FOLDER}\\CSAR\\v1.40\\Tickets\\sprint-4`
+// const PROJECT_FOLDER = `${BASE_RESOURCES_FOLDER}\\CSAR\\v1.40\\Tickets\\sprint-5`;
+// const PROJECT_FOLDER= `${BASE_RESOURCES_FOLDER}\\CASA\\Tickets`
+const PROJECT_FOLDER= `${BASE_RESOURCES_FOLDER}\\FGW\\Tickets`
 
 const newTickets = [
-  "Story/CSAR-920/update-manual-for-v140",
-  "Defect - CSAR-877 - duplicate accounts are bulk merged",
+  "Improvement/FGW-322/setup-pipeline-in-gitlab",
 ];
 
 function categorize(string, folders) {
   let entry = string;
-  const hotstring = (ticket, type = "") => `::${ticket}${type}::`;
+
+  const hotstring = (ticket, type = "") => `::${ticket.toLowerCase().split("-").join("")}${type}::`;
 
   if (entry.includes("/")) {
     entry = entry.split("/");
