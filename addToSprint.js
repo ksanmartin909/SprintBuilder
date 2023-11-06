@@ -21,7 +21,7 @@ function categorize(string, folders) {
     let [type, ticket, description] = entry;
     const file = `${ticket} - ${description.split("-").join(" ")}`;
     folders.push(`${PROJECT_FOLDER}\\"${file}"`);
-    console.log(`# ${date.toISOString().split("T")[0]} \n`);
+    console.log(`# ${date.toISOString().split("T")[0]}`);
     console.log(`${hotstring(ticket, "file")}${file}`);
     console.log(`${hotstring(ticket, "git")}${string}`);
     console.log(`${hotstring(ticket)}${ticket}`);
