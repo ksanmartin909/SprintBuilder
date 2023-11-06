@@ -15,8 +15,10 @@ var nodemailer = require("nodemailer");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
-function generateHotstrings({ tickets, prefix }) {
+function generateHotstrings({ tickets, prefix, sprint }) {
   let hotstrings = "";
+
+  const date = new Date();
 
   for (let [key, value] of Object.entries(tickets)) {
     let type = Type.STORY;
@@ -26,7 +28,7 @@ function generateHotstrings({ tickets, prefix }) {
       type = value.split("/")[0];
       text = value.split("/")[1];
     }
-
+    hotstrings += `# ${sprint} - ${date.toISOString().split("T")[0]} \n`;
     hotstrings += `::${prefix.toLowerCase()}${key}${
       Hotkey.JIRA
     }::${type}/${prefix}-${key}/${text.split(" ").join("-")}\n`;
@@ -42,9 +44,9 @@ function generateHotstrings({ tickets, prefix }) {
 }
 
 function writeSprintAHK(projectData) {
-  fs.writeFile(
+  fs.appendFile(
     `${PROJECT_RESOURCES_FOLDER}/${projectData.prefix}/${BUILD_FOLDER}/${projectData.prefix}-Tickets.ahk`,
-    AHK_HEADER.concat(generateHotstrings(projectData)),
+    generateHotstrings(projectData),
     (err) => {
       if (err) {
         console.log(err);
@@ -121,7 +123,7 @@ const makeSnapshotFolders = async (projectData) => {
   sprint = sprint ?? "sprint";
   let folders = [];
   for (let [key, value] of Object.entries(tickets)) {
-    if(value.includes("/")) {
+    if (value.includes("/")) {
       value = value.split("/")[1];
     }
     let text = value.split("-").join(" ");
