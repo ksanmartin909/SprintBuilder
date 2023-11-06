@@ -55,7 +55,7 @@ async function process(tickets) {
   let folders = [];
 
   printHotstrings(tickets, folders);
-  // await makeFolders(folders);
+  await makeFolders(folders);
 }
 function printHotstrings(tickets, folders) {
   for (const string of tickets) {
