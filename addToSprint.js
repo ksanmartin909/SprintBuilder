@@ -8,7 +8,7 @@ const BASE_RESOURCES_FOLDER = `D:\\Users\\Filament_Games\\Documents\\ProjectReso
 // const PROJECT_FOLDER= `${BASE_RESOURCES_FOLDER}\\CASA\\Tickets`
 const PROJECT_FOLDER = `${BASE_RESOURCES_FOLDER}\\FGW\\Tickets`;
 
-const newTickets = ["Defect/CSAR-952/WSOD-defensive-approach"];
+const newTickets = ["Defect/CSAR-952-CSAR-954/WSOD-defensive-approach"];
 
 function categorize(string, folders) {
   let entry = string;
