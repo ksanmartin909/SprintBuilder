@@ -20,6 +20,7 @@ function generateHotstrings({ tickets, prefix, sprint }) {
 
   const date = new Date();
 
+  hotstrings += `; ${sprint} - ${date.toISOString().split("T")[0]} \n\n`;
   for (let [key, value] of Object.entries(tickets)) {
     let type = Type.STORY;
     let text = value;
@@ -28,7 +29,6 @@ function generateHotstrings({ tickets, prefix, sprint }) {
       type = value.split("/")[0];
       text = value.split("/")[1];
     }
-    hotstrings += `# ${sprint} - ${date.toISOString().split("T")[0]} \n`;
     hotstrings += `::${prefix.toLowerCase()}${key}${
       Hotkey.JIRA
     }::${type}/${prefix}-${key}/${text.split(" ").join("-")}\n`;
