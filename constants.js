@@ -1,8 +1,7 @@
-const PREFIX = "CSAR";
 const PROJECT_RESOURCES_FOLDER =
   "D:\\Users\\Filament_Games\\Documents\\ProjectResources";
 const BUILD_FOLDER = "builder-folder";
-const JIRA_URL = `https://filamentgames.atlassian.net/browse/${PREFIX}-`;
+const JIRA_URL = `https://filamentgames.atlassian.net/browse`;
 
 const USERNAME = "ksanmartin@filamentgames.com";
 const APP_PASS = "pafi wsyd lykp nsyp";
@@ -47,7 +46,6 @@ module.exports = {
   JIRA_URL,
   Messages,
   AHK_HEADER,
-  PREFIX,
   Labels,
   PROJECT_RESOURCES_FOLDER,
   BUILD_FOLDER,

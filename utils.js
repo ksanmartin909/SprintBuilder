@@ -94,7 +94,7 @@ function sendSprintCardsToBoard(projectData) {
       type = value.split("/")[0];
       text = value.split("/")[1];
     }
-    const jiraTicket = `**Jira Ticket:** \n ${JIRA_URL}${key} \n\n`;
+    const jiraTicket = `**Jira Ticket:** \n ${JIRA_URL}\\${prefix}-${key} \n\n`;
     const prLink = `**PR Link:** \n\n\n\n`;
     const description = `**Description:** \n\n`;
 
