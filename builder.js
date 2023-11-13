@@ -21,6 +21,10 @@ const functions = [
     label: "2. Make Screenshot Folders",
     fn: (sprintData) => makeSnapshotFolders(sprintData),
   },
+  {
+    label: "3. Make Trello Cards",
+    fn: (sprintData) => sendSprintCardsToBoard(sprintData),
+  },
 ];
 async function buildSprint() {
   const { prefix, sprint, choices } = await readUserInput();
