@@ -12,8 +12,18 @@ const {
 } = require("./utils");
 const { PROJECT_RESOURCES_FOLDER, BUILD_FOLDER } = require("./constants");
 
+const functions = [
+  {
+    label: "1. Write AHK Scripts",
+    fn: (sprintData) => writeSprintAHK(sprintData),
+  },
+  {
+    label: "2. Make Screenshot Folders",
+    fn: (sprintData) => makeSnapshotFolders(sprintData),
+  },
+];
 async function buildSprint() {
-  const { prefix, sprint } = await readUserInput();
+  const { prefix, sprint, choices } = await readUserInput();
 
   const sprintData = {
     ...(await getProjectData(prefix)),
@@ -22,10 +32,10 @@ async function buildSprint() {
   };
 
   console.log(sprintData);
-
-  writeSprintAHK(sprintData);
-  makeSnapshotFolders(sprintData);
-  sendSprintCardsToBoard(sprintData);
+  showChoices(choices);
+  for (const choice of choices) {
+    functions[choice].fn(sprintData);
+  }
 }
 
 buildSprint();
@@ -33,22 +43,71 @@ buildSprint();
 async function readUserInput() {
   const promise = new Promise((resolve, reject) => {
     let prefix = "";
-    let sprint = "";
+    let sprint = "sprint-";
+    let choices = [];
     readline.question("For what project? ", function (input) {
       prefix = input;
       readline.question("What sprint? ", function (id) {
-        sprint = id;
-        readline.close();
+        sprint += id;
+
+        choicesPrompt();
+        readline.on("line", function (input) {
+          const isList = isNaN(parseInt(input)) ? false : true;
+          if (isList) {
+            choices = confirmPrompt(input);
+            readline.on("line", function () {});
+          } else {
+            switch (input.toLowerCase()) {
+              case "y":
+                readline.close();
+                break;
+              case "n":
+                choicesPrompt();
+                break;
+              default:
+                break;
+            }
+          }
+        });
       });
     });
     readline.on("close", function () {
-      resolve({ prefix: prefix.toUpperCase(), sprint });
+      resolve({ prefix: prefix.toUpperCase(), sprint, choices });
     });
   });
 
   return promise;
 }
+function choicesPrompt() {
+  readline.setPrompt("What tasks do you want to run?\n");
+  console.log("\n====================================");
+  readline.prompt();
+  console.log("====================================");
+  showChoices();
+}
+function confirmPrompt(input) {
+  const choices = input.split(",").map((choice) => parseInt(choice) - 1);
+  console.log("\n====================================");
+  console.log("You chose:");
+  console.log("====================================");
+  showChoices(choices);
+  readline.setPrompt("\nIs this correct? (Y/N) ");
+  readline.prompt();
+  return choices;
+}
 
+function showChoices(choices = []) {
+  if (choices.length === 0) {
+    for (let fn of functions) {
+      console.log(fn.label);
+    }
+  } else {
+    for (const choice of choices) {
+      console.log(functions[choice].label);
+    }
+  }
+  console.log();
+}
 async function getTickets(prefix) {
   let tickets = {};
   await execPromise(
@@ -58,23 +117,6 @@ async function getTickets(prefix) {
       tickets,
     }
   );
-  function printTasks(tasks) {
-    for (let values of Object.values(tasks)) {
-      console.log(values.label);
-    }
-  }
-  function getTasks(sprintData) {
-    return {
-      1: {
-        label: "1. Write AHK Scripts",
-        fn: () => writeSprintAHK(sprintData),
-      },
-      2: {
-        label: "1. Make Screenshot Folders",
-        fn: () => makeSnapshotFolders(sprintData),
-      },
-    };
-  }
 
   function parseTicketStdOut(stdout, returnValues) {
     const { tickets } = returnValues;
