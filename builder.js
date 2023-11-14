@@ -87,10 +87,11 @@ function choicesPrompt() {
   console.log("\n====================================");
   readline.prompt();
   console.log("====================================");
+  readline.setPrompt("\n\n");
   showChoices();
 }
 function confirmPrompt(input) {
-  const choices = input.split(",").map((choice) => parseInt(choice) - 1);
+  const choices = 
   console.log("\n====================================");
   console.log("You chose:");
   console.log("====================================");
@@ -99,7 +100,9 @@ function confirmPrompt(input) {
   readline.prompt();
   return choices;
 }
-
+function getUserChoices(input) {
+return input.split(",").map((choice) => parseInt(choice) - 1);    
+}
 function showChoices(choices = []) {
   if (choices.length === 0) {
     for (let fn of functions) {
