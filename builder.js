@@ -26,19 +26,26 @@ const functions = [
     fn: (sprintData) => sendSprintCardsToBoard(sprintData),
   },
 ];
+
 async function buildSprint() {
+  const projects = ["casa", "fgw", "csar"];
   const { prefix, sprint, choices } = await readUserInput();
 
-  const sprintData = {
-    ...(await getProjectData(prefix)),
-    tickets: await getTickets(prefix),
-    sprint,
-  };
-
-  console.log(sprintData);
-  showChoices(choices);
-  for (const choice of choices) {
-    functions[choice].fn(sprintData);
+  if (projects.includes(prefix.toLowerCase()) && choices.length) {
+    console.log(sprintData);
+    const sprintData = {
+      ...(await getProjectData(prefix)),
+      tickets: await getTickets(prefix),
+      sprint,
+    };
+    showChoices(choices);
+    for (const choice of choices) {
+      functions[choice].fn(sprintData);
+    }
+  } else {
+    console.log("\nInvalid prefix or choices.");
+    console.log({ prefix, sprint, choices });
+    console.log();
   }
 }
 
@@ -69,6 +76,7 @@ async function readUserInput() {
                 choicesPrompt();
                 break;
               default:
+                choices = [];
                 break;
             }
           }
@@ -91,7 +99,8 @@ function choicesPrompt() {
   showChoices();
 }
 function confirmPrompt(input) {
-  const choices = console.log("\n====================================");
+  const choices = getUserChoices(input);
+  console.log("\n====================================");
   console.log("You chose:");
   console.log("====================================");
   showChoices(choices);
@@ -99,6 +108,7 @@ function confirmPrompt(input) {
   readline.prompt();
   return choices;
 }
+
 function getUserChoices(input) {
   return input.split(",").map((choice) => parseInt(choice) - 1);
 }
