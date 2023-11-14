@@ -32,13 +32,15 @@ async function buildSprint() {
   const { prefix, sprint, choices } = await readUserInput();
 
   if (projects.includes(prefix.toLowerCase()) && choices.length) {
-    console.log(sprintData);
     const sprintData = {
       ...(await getProjectData(prefix)),
       tickets: await getTickets(prefix),
       sprint,
     };
+    
+    console.log(sprintData);
     showChoices(choices);
+
     for (const choice of choices) {
       functions[choice].fn(sprintData);
     }
