@@ -91,8 +91,7 @@ function choicesPrompt() {
   showChoices();
 }
 function confirmPrompt(input) {
-  const choices = 
-  console.log("\n====================================");
+  const choices = console.log("\n====================================");
   console.log("You chose:");
   console.log("====================================");
   showChoices(choices);
@@ -101,7 +100,7 @@ function confirmPrompt(input) {
   return choices;
 }
 function getUserChoices(input) {
-return input.split(",").map((choice) => parseInt(choice) - 1);    
+  return input.split(",").map((choice) => parseInt(choice) - 1);
 }
 function showChoices(choices = []) {
   if (choices.length === 0) {
