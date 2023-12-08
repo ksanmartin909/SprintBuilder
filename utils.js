@@ -7,7 +7,7 @@ const {
   AHK_HEADER,
   Labels,
   Messages,
-  PROJECT_RESOURCES_FOLDER,
+  PROJECT_VAULTS_FOLDER,
   BUILD_FOLDER,
 } = require("./constants");
 const fs = require("fs");
@@ -45,7 +45,7 @@ function generateHotstrings({ tickets, prefix, sprint }) {
 
 function writeSprintAHK(projectData) {
   fs.appendFile(
-    `${PROJECT_RESOURCES_FOLDER}/${projectData.prefix}/${BUILD_FOLDER}/${projectData.prefix}-Tickets.ahk`,
+    `${PROJECT_VAULTS_FOLDER}/${projectData.prefix}/${BUILD_FOLDER}/${projectData.prefix}-Tickets.ahk`,
     generateHotstrings(projectData),
     (err) => {
       if (err) {
@@ -128,10 +128,11 @@ const makeSnapshotFolders = async (projectData) => {
     }
     let text = value.split("-").join(" ");
     folders.push(
-      `"${PROJECT_RESOURCES_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}"`
+      `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}"`
     );
   }
   const command = "mkdir " + folders.join(" ");
+  console.log(command);
 
   try {
     await execPromise(command);

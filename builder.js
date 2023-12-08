@@ -10,7 +10,7 @@ const {
   sendSprintCardsToBoard,
   execPromise,
 } = require("./utils");
-const { PROJECT_RESOURCES_FOLDER, BUILD_FOLDER } = require("./constants");
+const { PROJECT_VAULTS_FOLDER, BUILD_FOLDER } = require("./constants");
 
 const functions = [
   {
@@ -129,7 +129,7 @@ function showChoices(choices = []) {
 async function getTickets(prefix) {
   let tickets = {};
   await execPromise(
-    `powershell Get-Content ${PROJECT_RESOURCES_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\tickets.txt`,
+    `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\tickets.txt`,
     parseTicketStdOut,
     {
       tickets,
@@ -151,7 +151,7 @@ async function getTickets(prefix) {
 async function getProjectData(prefix) {
   const projects = {};
   await execPromise(
-    `powershell Get-Content ${PROJECT_RESOURCES_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\project.txt`,
+    `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\project.txt`,
     parseProjectStdOut,
     {
       projects,

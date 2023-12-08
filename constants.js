@@ -1,5 +1,6 @@
-const PROJECT_RESOURCES_FOLDER =
-  "D:\\Users\\Filament_Games\\Documents\\ProjectResources";
+// Note: The ` is used to escape spaces
+const PROJECT_VAULTS_FOLDER =
+  "D:\\Users\\Filament_Games\\Documents\\ProjectResources\\Vaults\\Projects";
 const BUILD_FOLDER = "builder-folder";
 const JIRA_URL = `https://filamentgames.atlassian.net/browse`;
 
@@ -47,6 +48,6 @@ module.exports = {
   Messages,
   AHK_HEADER,
   Labels,
-  PROJECT_RESOURCES_FOLDER,
+  PROJECT_VAULTS_FOLDER,
   BUILD_FOLDER,
 };
