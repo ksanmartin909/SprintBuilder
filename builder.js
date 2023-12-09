@@ -8,9 +8,16 @@ const {
   makeSnapshotFolders,
   writeSprintAHK,
   sendSprintCardsToBoard,
+  appendPreviousTickets,
+  resetTicketsFile,
   execPromise,
 } = require("./utils");
-const { PROJECT_VAULTS_FOLDER, BUILD_FOLDER } = require("./constants");
+const {
+  PROJECT_VAULTS_FOLDER,
+  BUILD_FOLDER,
+  TICKETS_FILE,
+  PREV_TICKETS_FILE,
+} = require("./constants");
 
 const functions = [
   {
@@ -37,7 +44,7 @@ async function buildSprint() {
       tickets: await getTickets(prefix),
       sprint,
     };
-    
+
     console.log(sprintData);
     showChoices(choices);
 
@@ -129,7 +136,7 @@ function showChoices(choices = []) {
 async function getTickets(prefix) {
   let tickets = {};
   await execPromise(
-    `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\tickets.txt`,
+    `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\${TICKETS_FILE}`,
     parseTicketStdOut,
     {
       tickets,
@@ -138,13 +145,26 @@ async function getTickets(prefix) {
 
   function parseTicketStdOut(stdout, returnValues) {
     const { tickets } = returnValues;
+
     let content = stdout.split("\r\n").filter((item) => item !== "");
-    for (const ticket in content) {
-      const [key, description] = content[ticket].split(": ");
-      tickets[key] = description;
+
+    let isPrevTicket = true;
+    for (const ticket of content) {
+      if (isPrevTicket && ticket !== "---") {
+        appendPreviousTickets(ticket, prefix);
+      }
+      if (ticket === "---") {
+        isPrevTicket = false;
+      }
+      const [key, description] = ticket.split(": ");
+      if (!isPrevTicket && description) {
+        tickets[key] = description;
+      }
     }
     return;
   }
+
+  await resetTicketsFile(tickets, prefix);
   return tickets;
 }
 

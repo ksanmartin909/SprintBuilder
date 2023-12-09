@@ -9,6 +9,8 @@ const {
   Messages,
   PROJECT_VAULTS_FOLDER,
   BUILD_FOLDER,
+  PREV_TICKETS_FILE,
+  TICKETS_FILE,
 } = require("./constants");
 const fs = require("fs");
 var nodemailer = require("nodemailer");
@@ -157,10 +159,50 @@ async function execPromise(
   return promise;
 }
 
+async function appendPreviousTickets(content, prefix) {
+  const entry = `${content}\r\n`;
+  fs.appendFile(
+    `${PROJECT_VAULTS_FOLDER}/${prefix}/${BUILD_FOLDER}/${PREV_TICKETS_FILE}`,
+    entry,
+    (err) => {
+      if (err) {
+        console.log(err);
+        console.error(Messages.PREVIOUS_TICKETS_ERROR);
+      } else {
+        console.log(Messages.PREVIOUS_TICKETS_APPENDED);
+      }
+    }
+  );
+}
+
+async function resetTicketsFile(ticketObj, prefix) {
+  // Convert the ticket object to a string
+  const ticketsString = Object.entries(ticketObj)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join("\r\n");
+  // Append the seperating line to the now previous tickets
+  const ticketOutput = ticketsString + "\r\n\r\n" + "---" + "\r\n";
+
+  // Overwrite the tickets file with the new tickets
+  fs.writeFile(
+    `${PROJECT_VAULTS_FOLDER}/${prefix}/${BUILD_FOLDER}/${TICKETS_FILE}`,
+    ticketOutput,
+    (err) => {
+      if (err) {
+        console.log(err);
+        console.error(Messages.TICKETS_FILE_WRITE_ERROR);
+      } else {
+        console.log(Messages.TICKETS_FILE_RESET);
+      }
+    }
+  );
+}
 module.exports = {
   execPromise,
   makeSnapshotFolders,
   generateHotstrings,
   writeSprintAHK,
   sendSprintCardsToBoard,
+  appendPreviousTickets,
+  resetTicketsFile,
 };
