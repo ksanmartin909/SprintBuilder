@@ -150,7 +150,7 @@ async function getTickets(prefix) {
 
     let isPrevTicket = true;
     for (const ticket of content) {
-      if (isPrevTicket && ticket !== "---") {
+      if (isPrevTicket && ticket !== "---" && ticket !== "") {
         appendPreviousTickets(ticket, prefix);
       }
       if (ticket === "---") {
