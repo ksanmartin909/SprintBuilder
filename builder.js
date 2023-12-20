@@ -11,6 +11,7 @@ const {
   appendPreviousTickets,
   resetTicketsFile,
   execPromise,
+  formatTicketStdOut,
 } = require("./utils");
 const {
   PROJECT_VAULTS_FOLDER,
@@ -36,12 +37,12 @@ const functions = [
 
 async function buildSprint() {
   const projects = ["casa", "fgw", "csar"];
-  const { prefix, sprint, choices } = await readUserInput();
+  const { prefix, sprint, choices, resetTickets } = await readUserInput();
 
   if (projects.includes(prefix.toLowerCase()) && choices.length) {
     const sprintData = {
       ...(await getProjectData(prefix)),
-      tickets: await getTickets(prefix),
+      tickets: await getTickets(prefix, resetTickets),
       sprint,
     };
 
@@ -65,35 +66,39 @@ async function readUserInput() {
     let prefix = "";
     let sprint = "sprint-";
     let choices = [];
+    let resetTickets = false;
     readline.question("For what project? ", function (input) {
       prefix = input;
       readline.question("What sprint? ", function (id) {
         sprint += id;
+        readline.question("Reset ticket file? (Y/N) ", function (reset) {
+          resetTickets = reset.toLowerCase() === "y" ? true : false;
 
-        choicesPrompt();
-        readline.on("line", function (input) {
-          const isList = isNaN(parseInt(input)) ? false : true;
-          if (isList) {
-            choices = confirmPrompt(input);
-            readline.on("line", function () {});
-          } else {
-            switch (input.toLowerCase()) {
-              case "y":
-                readline.close();
-                break;
-              case "n":
-                choicesPrompt();
-                break;
-              default:
-                choices = [];
-                break;
+          choicesPrompt();
+          readline.on("line", function (input) {
+            const isList = isNaN(parseInt(input)) ? false : true;
+            if (isList) {
+              choices = confirmPrompt(input);
+              readline.on("line", function () {});
+            } else {
+              switch (input.toLowerCase()) {
+                case "y":
+                  readline.close();
+                  break;
+                case "n":
+                  choicesPrompt();
+                  break;
+                default:
+                  choices = [];
+                  break;
+              }
             }
-          }
+          });
         });
       });
     });
     readline.on("close", function () {
-      resolve({ prefix: prefix.toUpperCase(), sprint, choices });
+      resolve({ prefix: prefix.toUpperCase(), sprint, choices, resetTickets });
     });
   });
 
@@ -133,7 +138,7 @@ function showChoices(choices = []) {
   }
   console.log();
 }
-async function getTickets(prefix) {
+async function getTickets(prefix, resetTickets = false) {
   let tickets = {};
   await execPromise(
     `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\${TICKETS_FILE}`,
@@ -146,25 +151,28 @@ async function getTickets(prefix) {
   function parseTicketStdOut(stdout, returnValues) {
     const { tickets } = returnValues;
 
-    let content = stdout.split("\r\n").filter((item) => item !== "");
+    let [prev, current] = stdout.split("---");
 
-    let isPrevTicket = true;
-    for (const ticket of content) {
-      if (isPrevTicket && ticket !== "---" && ticket !== "") {
+    prev = formatTicketStdOut(prev);
+    current = formatTicketStdOut(current);
+    console.log(prev, current);
+
+    if (current)
+      for (const ticket of current) {
+        const [key, description] = ticket.split(": ");
+        if (description) {
+          tickets[key] = description;
+        }
+      }
+
+    if (prev && resetTickets)
+      for (const ticket of prev) {
+        //TODO Make so  only pass 1 string to appendPreviousTickets
         appendPreviousTickets(ticket, prefix);
       }
-      if (ticket === "---") {
-        isPrevTicket = false;
-      }
-      const [key, description] = ticket.split(": ");
-      if (!isPrevTicket && description) {
-        tickets[key] = description;
-      }
-    }
-    return;
   }
 
-  await resetTicketsFile(tickets, prefix);
+  if (resetTickets) resetTicketsFile(tickets, prefix);
   return tickets;
 }
 

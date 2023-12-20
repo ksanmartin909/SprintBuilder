@@ -175,6 +175,17 @@ async function appendPreviousTickets(content, prefix) {
   );
 }
 
+function formatTicketStdOut(ticket) {
+  let result = [];
+  if (ticket?.length) {
+    result = ticket
+      .replace(/\r\n\r\n/g, "")
+      .split("\r\n")
+      .filter((item) => item !== "");
+  }
+  return result;
+}
+
 async function resetTicketsFile(ticketObj, prefix) {
   // Convert the ticket object to a string
   const ticketsString = Object.entries(ticketObj)
@@ -205,4 +216,5 @@ module.exports = {
   sendSprintCardsToBoard,
   appendPreviousTickets,
   resetTicketsFile,
+  formatTicketStdOut,
 };
