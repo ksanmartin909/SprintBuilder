@@ -17,6 +17,7 @@ var nodemailer = require("nodemailer");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
+
 function generateHotstrings({ tickets, prefix, sprint }) {
   let hotstrings = "";
 
@@ -41,13 +42,13 @@ function generateHotstrings({ tickets, prefix, sprint }) {
 
     hotstrings += `::${prefix.toLowerCase()}${key}::${prefix}-${key}\n\n`;
   }
-
   return hotstrings;
 }
 
 function writeSprintAHK(projectData) {
+  const ahkPath = `${PROJECT_VAULTS_FOLDER}/${projectData.prefix}/${BUILD_FOLDER}/${projectData.prefix}-Tickets.ahk`;
   fs.appendFile(
-    `${PROJECT_VAULTS_FOLDER}/${projectData.prefix}/${BUILD_FOLDER}/${projectData.prefix}-Tickets.ahk`,
+    ahkPath,
     generateHotstrings(projectData),
     (err) => {
       if (err) {
@@ -58,6 +59,7 @@ function writeSprintAHK(projectData) {
       }
     }
   );
+ 
 }
 
 function emailToTrello(
@@ -88,17 +90,24 @@ function emailToTrello(
 
 function sendSprintCardsToBoard(projectData) {
   const { tickets, boardEmail, prefix } = projectData;
+
   for (let [key, value] of Object.entries(tickets)) {
     let type = Type.STORY;
     let text = value;
+    const ticketId = `${prefix}-${key}`;
 
     if (text.includes("/")) {
       type = value.split("/")[0];
       text = value.split("/")[1];
     }
-    const jiraTicket = `**Jira Ticket:** \n ${JIRA_URL}/${prefix}-${key} \n\n`;
+    const jiraTicket = `**Jira Ticket:** \n ${JIRA_URL}/${ticketId} \n\n`;
     const prLink = `**PR Link:** \n\n\n\n`;
-    const description = `**Description:** \n\n`;
+    const description = `**Description:** \n ${generateObsidianLink({
+      ...projectData,
+      ticketId,
+      text,
+      key,
+    })} \n`;
 
     const labels = [
       Labels.NEEDS_PROOF,
@@ -124,6 +133,7 @@ const makeSnapshotFolders = async (projectData) => {
   let { prefix, tickets, screenshotPath, sprint } = projectData;
   sprint = sprint ?? "sprint";
   let folders = [];
+  let files = [];
   for (let [key, value] of Object.entries(tickets)) {
     if (value.includes("/")) {
       value = value.split("/")[1];
@@ -132,12 +142,16 @@ const makeSnapshotFolders = async (projectData) => {
     folders.push(
       `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}"`
     );
+    files.push(
+      `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}\\${prefix}-${key} - Notes.md"`
+    );
   }
-  const command = "mkdir " + folders.join(" ");
-  console.log(command);
+  const mkdir = "mkdir " + folders.join(" ");
+  const mkfile = `echo . > ${files.join(" && echo . > ")}`;
 
   try {
-    await execPromise(command);
+    await execPromise(mkdir);
+    await execPromise(mkfile);
     console.log(Messages.FOLDERS_CREATED);
   } catch (err) {
     console.log(Messages.FOLDER_CREATE_ERROR);
@@ -207,6 +221,22 @@ async function resetTicketsFile(ticketObj, prefix) {
       }
     }
   );
+}
+function generateObsidianLink(projectData) {
+  const { prefix, sprint, screenshotPath, ticketId, text} = projectData;
+  const NOTES_FILE = "Notes.md";
+
+  const path = `${screenshotPath}/${sprint}/${ticketId} - ${text
+    .split("-")
+    .join(" ")}/${ticketId} - ${NOTES_FILE}`
+    .replace(/ /g, "%20")
+    .replace(/[/]/g, "%2F");
+
+  const label = "[Obsidian - Notes]";
+  const leader = `obsidian://open?vault=${prefix}&file=`;
+
+  console.log(`${label}(${leader}${path})`);
+  return `${label}(${leader}${path})`;
 }
 module.exports = {
   execPromise,

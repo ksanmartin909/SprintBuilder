@@ -36,7 +36,7 @@ const functions = [
 ];
 
 async function buildSprint() {
-  const projects = ["casa", "fgw", "csar"];
+  const projects = ["casa", "fgw", "csar", "rcws","zber"];
   const { prefix, sprint, choices, resetTickets } = await readUserInput();
 
   if (projects.includes(prefix.toLowerCase()) && choices.length) {
@@ -138,7 +138,7 @@ function showChoices(choices = []) {
   }
   console.log();
 }
-async function getTickets(prefix, resetTickets = false) {
+async function getTickets(prefix, resetTickets) {
   let tickets = {};
   await execPromise(
     `powershell Get-Content ${PROJECT_VAULTS_FOLDER}\\${prefix}\\${BUILD_FOLDER}\\${TICKETS_FILE}`,
@@ -148,14 +148,13 @@ async function getTickets(prefix, resetTickets = false) {
     }
   );
 
-  function parseTicketStdOut(stdout, returnValues) {
+  async function parseTicketStdOut(stdout, returnValues) {
     const { tickets } = returnValues;
-
-    let [prev, current] = stdout.split("---");
+    let [prev, current] = await stdout.split("---");
 
     prev = formatTicketStdOut(prev);
     current = formatTicketStdOut(current);
-    console.log(prev, current);
+    console.log({ prev, tickets });
 
     if (current)
       for (const ticket of current) {
@@ -166,9 +165,9 @@ async function getTickets(prefix, resetTickets = false) {
       }
 
     if (prev && resetTickets)
-      for (const ticket of prev) {
-        //TODO Make so  only pass 1 string to appendPreviousTickets
+      for (let ticket of prev) {
         appendPreviousTickets(ticket, prefix);
+        //TODO Make so  only pass 1 string to appendPreviousTickets
       }
   }
 
