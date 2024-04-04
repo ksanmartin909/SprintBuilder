@@ -142,6 +142,9 @@ const makeSnapshotFolders = async (projectData) => {
     folders.push(
       `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}"`
     );
+    folders.push(
+      `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}\\${prefix}-${key} - Images"`
+    );
     files.push(
       `"${PROJECT_VAULTS_FOLDER}\\${prefix}\\${screenshotPath}\\${sprint}\\${prefix}-${key} - ${text}\\${prefix}-${key} - Notes.md"`
     );
